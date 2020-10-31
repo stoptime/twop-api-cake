@@ -40,9 +40,13 @@ class AppController extends Controller
     public function initialize(): void
     {
         parent::initialize();
+        //$this->loadComponent('RequestHandler');
+    }
 
-        $this->loadComponent('RequestHandler');
-
-
+    protected function returnJson($var) {
+        $this->set(compact($var));
+        $var = json_encode($var,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $this->viewBuilder()->setOption('serialize', ['var']);
+        return $this->response->withType('application/json; charset=utf-8')->withStringBody($var);
     }
 }

@@ -10,11 +10,10 @@ use Cake\Http\ServerRequest;
 
 class ShowsController extends AppController
 {
-
     public function index()
     {
         $shows = $this->Shows->find();
-        $this->set(compact('shows'));
+        return $this->returnJson($shows);
     }
 
     public function view(string $slug)
@@ -32,11 +31,7 @@ class ShowsController extends AppController
         $show->total_seasons = $this->Shows->getTotalSeasons($show->get('sid'));
         // get total reviews (not episodes)
         $show->total_reviews = $this->Shows->getTotalReviews($show->get('sid'));
-        // output
-        $show = json_encode($show,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        $this->set(compact('show'));
-        $this->viewBuilder()->setOption('serialize', true);
-        // comment below out to use normal cake view
-        return $this->response->withType('application/json; charset=utf-8')->withStringBody($show);
+
+        return $this->returnJson($show);
     }
 }
