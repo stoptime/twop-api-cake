@@ -79,7 +79,7 @@ $routes->scope('/', function (RouteBuilder $builder) {
         ->setPass(['slug', 'season'])
         ->setPatterns([
             'slug' => '[a-z0-9-_]+',
-            'season' => '[a-z0-9-_]+'
+            'season' => '[a-zA-Z0-9-_]+'
         ]);
 
     /*
