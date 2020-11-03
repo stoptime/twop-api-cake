@@ -58,7 +58,29 @@ $routes->scope('/', function (RouteBuilder $builder) {
     $builder->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
 
     $builder->connect('/shows', ['controller' => 'Shows', 'action' => 'index']);
-    $builder->connect('/shows/*', ['controller' => 'Shows', 'action' => 'view']);
+
+    $builder->connect('/shows/{slug}',
+        ['controller' => 'Shows', 'action' => 'view'])
+        ->setMethods(['GET'])
+        ->setPass(['slug'])
+        ->setPatterns(['slug' => '[a-z0-9-_]+']);
+
+    $builder->connect('/shows/{slug}/seasons',
+        ['controller' => 'Shows', 'action' => 'getSeasonsForShow'])
+        ->setMethods(['GET'])
+        ->setPass(['slug'])
+        ->setPatterns([
+            'slug' => '[a-z0-9-_]+',
+        ]);
+
+    $builder->connect('/shows/{slug}/seasons/{season}',
+        ['controller' => 'Shows', 'action' => 'getSeason'])
+        ->setMethods(['GET'])
+        ->setPass(['slug', 'season'])
+        ->setPatterns([
+            'slug' => '[a-z0-9-_]+',
+            'season' => '[a-z0-9-_]+'
+        ]);
 
     /*
      * Connect catchall routes for all controllers.

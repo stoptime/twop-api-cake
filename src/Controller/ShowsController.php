@@ -2,36 +2,90 @@
 
 namespace App\Controller;
 
-use App\Model\Table\ShowsTable;
 use Cake\Controller\ComponentRegistry;
+use Cake\Datasource\RepositoryInterface;
 use Cake\Event\EventManagerInterface;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
+use Cake\Core\Configure;
 
+/**
+ * @property RepositoryInterface|null Shows
+ */
 class ShowsController extends AppController
 {
-    public function index()
+    /**
+     * @return Response|null
+     */
+    public function index(): ?Response
     {
-        $shows = $this->Shows->find();
+        try {
+            $shows = $this->Shows->find();
+        } catch (\Exception $e) {
+            return $this->returnJson404();
+        }
+
+        foreach ($shows as $show) {
+            $slug = $this->getShowSlug($show->url);
+            $show->api_url = BASE_URL . "/shows/$slug";
+        }
+
         return $this->returnJson($shows);
     }
 
-    public function view(string $slug)
+    /**
+     * @param string $slug
+     * @return Response|null
+     */
+    public function view(string $slug): ?Response
     {
         $url = sprintf('http://www.brilliantbutcancelled.com/show/%s/', $slug);
         try {
             $show = $this->Shows->findByUrl($url)->firstOrFail();
         } catch (\Exception $e) {
-            return $this->response->withType('application/json; charset=utf-8')
-                ->withStringBody('Show not found.')
-                ->withStatus(404, 'Not Found');
+            return $this->returnJson404();
         }
 
-        // grab total seasons
-        $show->total_seasons = $this->Shows->getTotalSeasons($show->get('sid'));
+        // grab seasons
+        $show->seasons = $this->Shows->getSeasons($show->get('sid'), $slug);
         // get total reviews (not episodes)
         $show->total_reviews = $this->Shows->getTotalReviews($show->get('sid'));
 
         return $this->returnJson($show);
+    }
+
+    /**
+     * @param string $slug
+     * @return Response|null
+     */
+    public function getSeasonsForShow(string $slug): ?Response
+    {
+        $sid = $this->Shows->getSidFromSlug($slug);
+        $seasons = $this->Shows->getSeasons($sid, $slug);
+        return $this->returnJson($seasons, false);
+    }
+
+    /**
+     * Note sometimes season numbers can include a non-int (22A)
+     * @param string $slug
+     * @param string $season_number
+     * @return Response|null
+     */
+    public function getSeason(string $slug, string $season_number): ?Response
+    {
+        $sid = $this->Shows->getSidFromSlug($slug);
+        $episodes_in_season = $this->Shows->getSeasonEpisodeList($sid, $season_number);
+        return $this->returnJson($episodes_in_season, false);
+    }
+
+    /**
+     * @param string $url
+     * @return string
+     */
+    protected function getShowSlug(string $url): string
+    {
+        $url = rtrim($url, '/');
+        $url_parts = explode('/', $url);
+        return $url_parts[count($url_parts) - 1];
     }
 }

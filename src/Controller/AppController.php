@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
+use \Cake\Http\Response;
 
 /**
  * Application Controller
@@ -29,24 +31,27 @@ use Cake\Controller\Controller;
 class AppController extends Controller
 {
     /**
-     * Initialization hook method.
-     *
-     * Use this method to add common initialization code like loading components.
-     *
-     * e.g. `$this->loadComponent('FormProtection');`
-     *
-     * @return void
+     * @param mixed $var
+     * @param bool $compact
+     * @return Response|null
      */
-    public function initialize(): void
+    protected function returnJson($var, bool $compact = true): ?Response
     {
-        parent::initialize();
-        //$this->loadComponent('RequestHandler');
-    }
-
-    protected function returnJson($var) {
-        $this->set(compact($var));
+        if ($compact) {
+            compact($var);
+        }
         $var = json_encode($var,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $this->viewBuilder()->setOption('serialize', ['var']);
         return $this->response->withType('application/json; charset=utf-8')->withStringBody($var);
+    }
+
+    /**
+     * @return Response|null
+     */
+    protected function returnJson404(): ?Response
+    {
+        return $this->response->withType('application/json; charset=utf-8')
+            ->withStringBody('Show not found.')
+            ->withStatus(404, 'Not Found');
     }
 }
