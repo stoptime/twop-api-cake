@@ -44,11 +44,13 @@ class ShowsTable extends \Cake\ORM\Table
 
         $return['count'] = $result->count();
         $seasons_result = $result->fetchAll('assoc');
+
         $seasons = [];
 
         foreach ($seasons_result as $key => $season_number) {
             $seasons[$season_number['season']] = BASE_URL . "/shows/$slug/seasons/" . $season_number['season'];
         }
+        ksort($seasons);
         $return['seasons'] = $seasons;
         return $return;
     }
