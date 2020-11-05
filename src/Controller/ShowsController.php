@@ -62,7 +62,7 @@ class ShowsController extends AppController
     {
         $sid = $this->Shows->getSidFromSlug($slug);
         $seasons = $this->Shows->getSeasons($sid, $slug);
-        return $this->returnJson($seasons, false);
+        return $this->returnJson($seasons);
     }
 
     /**
@@ -75,7 +75,8 @@ class ShowsController extends AppController
     {
         $sid = $this->Shows->getSidFromSlug($slug);
         $episodes_in_season = $this->Shows->getSeasonEpisodeList($sid, $season_number);
-        return $this->returnJson($episodes_in_season, false);
+
+        return $this->returnJson($episodes_in_season);
     }
 
     /**

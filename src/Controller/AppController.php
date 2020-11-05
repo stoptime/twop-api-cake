@@ -35,11 +35,8 @@ class AppController extends Controller
      * @param bool $compact
      * @return Response|null
      */
-    protected function returnJson($var, bool $compact = true): ?Response
+    protected function returnJson($var): ?Response
     {
-        if ($compact) {
-            compact($var);
-        }
         $var = json_encode($var,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $this->viewBuilder()->setOption('serialize', ['var']);
         return $this->response->withType('application/json; charset=utf-8')->withStringBody($var);

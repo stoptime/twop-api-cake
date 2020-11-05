@@ -82,6 +82,16 @@ $routes->scope('/', function (RouteBuilder $builder) {
             'season' => '[a-zA-Z0-9-_]+'
         ]);
 
+    // same as above
+    $builder->connect('/shows/{slug}/seasons/{season}/episodes',
+        ['controller' => 'Shows', 'action' => 'getSeason'])
+        ->setMethods(['GET'])
+        ->setPass(['slug', 'season'])
+        ->setPatterns([
+            'slug' => '[a-z0-9-_]+',
+            'season' => '[a-zA-Z0-9-_]+'
+        ]);
+
     /*
      * Connect catchall routes for all controllers.
      *

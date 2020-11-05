@@ -71,12 +71,17 @@ class ShowsTable extends \Cake\ORM\Table
      * @param string $slug
      * @return int
      */
-    public function getSidFromSlug(string $slug): int
+    public function getSidFromSlug(string $slug): ?int
     {
         $url = $this->urlStart . "/$slug/";
         $sql = "SELECT sid FROM shows WHERE url = ?";
         $result = $this->connection->execute($sql, [$url])->fetch();
-        return $result[0];
+        if ($result) {
+            return intval($result[0]);
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -85,12 +90,27 @@ class ShowsTable extends \Cake\ORM\Table
      * Note: season may contain a letter
      * @param int $sid
      * @param string $season
-     * @return array|false
+     * @return array
      */
-    public function getSeasonEpisodeList(int $sid, string $season): ?array
+    public function getSeasonEpisodeList(int $sid, string $season): array
     {
         $sql = "SELECT title, season, episode, air_date, grade, author, episode_meta, url, url_slug
             FROM episodes WHERE sid = ? AND season = ? ORDER BY eid DESC";
-        return $this->connection->execute($sql, [$sid, $season])->fetchAll('assoc');
+        $results = $this->connection->execute($sql, [$sid, $season])->fetchAll('assoc');
+        if ($results) {
+            $return = [];
+            $return['count'] = count($results);
+            foreach ($results as &$season) {
+                $episodes_slug = '/episodes/';
+                $req_url = rtrim($_SERVER['REQUEST_URI'], "/");
+                if (strpos($req_url, 'episodes')) {
+                    $episodes_slug = '/';
+                }
+                $season['api_url'] = BASE_URL . $req_url . $episodes_slug . $season['episode'];
+            }
+            $return['episodes'] = $results;
+            return $return;
+        }
+        return [];
     }
 }
