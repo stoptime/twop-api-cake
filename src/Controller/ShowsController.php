@@ -80,6 +80,30 @@ class ShowsController extends AppController
     }
 
     /**
+     * @param string $show_slug
+     * @param string $season_id
+     * @param string $episode_id
+     * @return Response|null
+     */
+    public function getEpisode(string $show_slug, string $season_id, string $episode_id): ?Response
+    {
+        $episode = $this->Shows->getEpisode($show_slug, $season_id, $episode_id);
+        return $this->returnJson($episode);
+    }
+
+    /**
+     * @param string $slug_1
+     * @param string $slug_2
+     * @return Response|null
+     */
+    public function getEpisodeFromSlug(string $slug_1, string $slug_2): ?Response
+    {
+        $full_slug = "/$slug_1/$slug_2";
+        $episode = $this->Shows->getEpisodeFromSlug($full_slug);
+        return $this->returnJson($episode);
+    }
+
+    /**
      * @param string $url
      * @return string
      */

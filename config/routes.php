@@ -92,6 +92,27 @@ $routes->scope('/', function (RouteBuilder $builder) {
             'season' => '[a-zA-Z0-9-_]+'
         ]);
 
+    // same as above
+    $builder->connect('/shows/{slug}/seasons/{season}/episodes/{episode}',
+        ['controller' => 'Shows', 'action' => 'getEpisode'])
+        ->setMethods(['GET'])
+        ->setPass(['slug', 'season', 'episode'])
+        ->setPatterns([
+            'slug' => '[a-z0-9-_]+',
+            'season' => '[a-zA-Z0-9-_]+',
+            'episode' => '[a-zA-Z0-9-_]+'
+        ]);
+
+    // primarily for the 1Pager calls
+    $builder->connect('/episode-from-slug/{slug1}/{slug2}',
+        ['controller' => 'Shows', 'action' => 'getEpisodeFromSlug'])
+        ->setMethods(['GET'])
+        ->SetPass(['slug1', 'slug2'])
+        ->setPatterns([
+            'slug1' => '[a-z0-9-_]+',
+            'slug2' => '[a-z0-9-_]+'
+        ]);
+
     /*
      * Connect catchall routes for all controllers.
      *

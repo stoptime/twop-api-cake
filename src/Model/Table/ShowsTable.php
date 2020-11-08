@@ -113,4 +113,43 @@ class ShowsTable extends \Cake\ORM\Table
         }
         return [];
     }
+
+    public function getEpisode(string $show_slug, string $season, string $episode): array
+    {
+        $show_id = $this->getSidFromSlug($show_slug);
+        $sql = "SELECT * FROM episodes WHERE sid = ? and season = ? and episode = ? LIMIT 1";
+        $result = $this->connection->execute($sql, [$show_id, $season, $episode])->fetchAll('assoc');
+        if ($result) {
+            return $result;
+        }
+        return [];
+    }
+
+    public function getEpisodeFromSlug(string $slug): array
+    {
+        $sql = "SELECT * FROM episodes WHERE url_slug = ? LIMIT 1";
+        $result = $this->connection->execute($sql, [$slug])->fetchAll('assoc');
+        if ($result) {
+            return $result;
+        }
+        return [];
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
